@@ -46,7 +46,7 @@ func NewPostgresDB() (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	// 🔥 AutoMigrate
+	
 	if err := db.AutoMigrate(
 		&model.User{},
 	); err != nil {
