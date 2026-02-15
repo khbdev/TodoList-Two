@@ -6,9 +6,8 @@ import (
 	"user-service/pkg"
 )
 
-
-func main(){
-	// env 
+func main() {
+	// env
 	pkg.LoadEnv()
 
 	// postgres
@@ -18,5 +17,11 @@ func main(){
 	}
 
 	_ = db
+	// redis
+	redisClient, err := config.NewRedisClient()
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	_ = redisClient
 }
