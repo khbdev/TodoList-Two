@@ -2,7 +2,10 @@ package main
 
 import (
 	"log"
+	"user-service/inrernal/cache"
 	"user-service/inrernal/config"
+	"user-service/inrernal/repository/postgres"
+
 	"user-service/pkg"
 )
 
@@ -24,4 +27,14 @@ func main() {
 	}
 
 	_ = redisClient
+
+
+  repo :=  postgres.NewUserRepo(db)
+ 
+  _ = repo
+
+
+  cache := cache.NewUserCache(redisClient)
+
+  _ = cache
 }
