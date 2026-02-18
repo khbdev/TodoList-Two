@@ -18,10 +18,9 @@ func NewUserGRPCHandler(uc domain.UserUsecase) *UserGRPCHandler {
 	return &UserGRPCHandler{uc: uc}
 }
 
-
+// -------------------- CreateUser --------------------
 func (h *UserGRPCHandler) CreateUser(ctx context.Context, req *userpb.CreateUserRequest) (*userpb.CreateUserResponse, error) {
-	
-	user, err := h.uc.Create(ctx, req.Name, req.Password)
+	user, err := h.uc.Create(ctx, req.Name, req.Email, req.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -59,9 +58,9 @@ func (h *UserGRPCHandler) GetUser(ctx context.Context, req *userpb.GetUserReques
 	}, nil
 }
 
-
+// -------------------- UpdateUser --------------------
 func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) (*userpb.UpdateUserResponse, error) {
-	
+	// proto’da password bor, lekin sening usecase update password qabul qilmaydi -> ignore
 	user, err := h.uc.Update(ctx, int(req.Id), req.Name, req.Email)
 	if err != nil {
 		return nil, err
@@ -80,20 +79,17 @@ func (h *UserGRPCHandler) UpdateUser(ctx context.Context, req *userpb.UpdateUser
 	}, nil
 }
 
-
+// -------------------- DeleteUser --------------------
 func (h *UserGRPCHandler) DeleteUser(ctx context.Context, req *userpb.DeleteUserRequest) (*userpb.DeleteUserResponse, error) {
 	if err := h.uc.Delete(ctx, int(req.Id)); err != nil {
 		return nil, err
 	}
-
-	return &userpb.DeleteUserResponse{
-		Message: "deleted",
-	}, nil
+	return &userpb.DeleteUserResponse{Message: "deleted"}, nil
 }
 
-
+// -------------------- ListUsers --------------------
 func (h *UserGRPCHandler) ListUsers(ctx context.Context, req *userpb.ListUsersRequest) (*userpb.ListUsersResponse, error) {
-
+	// limit/offset hozir usecase’da yo’q -> ignore
 	users, err := h.uc.GetAll(ctx)
 	if err != nil {
 		return nil, err

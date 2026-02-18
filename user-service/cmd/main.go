@@ -11,8 +11,10 @@ import (
 	"user-service/inrernal/cache"
 	"user-service/inrernal/config"
 	"user-service/inrernal/handler"
-	"user-service/inrernal/repository/postgres"
 	"user-service/inrernal/usecase"
+
+	"user-service/inrernal/repository/postgres"
+
 	"user-service/pkg"
 
 	userpb "github.com/khbdev/todolist-proto/proto/user"

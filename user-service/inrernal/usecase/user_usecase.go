@@ -28,9 +28,12 @@ func NewUserService(repo domain.UserRepository, cache domain.UserCache, ttl time
 	}
 }
 
-func (s *UserService) Create(ctx context.Context, name string, password string) (*model.User, error) {
+func (s *UserService) Create(ctx context.Context, name string, email string, password string) (*model.User, error) {
 	if strings.TrimSpace(name) == "" {
 		return nil, errors.New("name required")
+	}
+	if strings.TrimSpace(email) == "" {
+		return nil, errors.New("email required")
 	}
 	if strings.TrimSpace(password) == "" {
 		return nil, errors.New("password required")
@@ -43,6 +46,7 @@ func (s *UserService) Create(ctx context.Context, name string, password string) 
 
 	user := &model.User{
 		Name:         strings.TrimSpace(name),
+		Email:        strings.ToLower(strings.TrimSpace(email)),
 		PasswordHash: hashed,
 	}
 
@@ -50,7 +54,7 @@ func (s *UserService) Create(ctx context.Context, name string, password string) 
 		return nil, err
 	}
 
-	
+	// write-through
 	if s.cache != nil && user.ID != 0 {
 		_ = s.cache.SetByID(ctx, user, s.ttl)
 	}
@@ -79,17 +83,16 @@ func (s *UserService) Update(ctx context.Context, id int, name string, email str
 		return nil, err
 	}
 
-	
+	// write-through
 	if s.cache != nil {
-		_ = s.cache.DeleteByID(ctx, id)      
-		_ = s.cache.SetByID(ctx, user, s.ttl) 
+		_ = s.cache.DeleteByID(ctx, id)
+		_ = s.cache.SetByID(ctx, user, s.ttl)
 	}
 
 	return user, nil
 }
 
 func (s *UserService) GetAll(ctx context.Context) ([]model.User, error) {
-
 	return s.repo.GetAll(ctx)
 }
 
@@ -98,7 +101,7 @@ func (s *UserService) GetByID(ctx context.Context, id int) (*model.User, error) 
 		return nil, errors.New("invalid id")
 	}
 
-
+	// read-through
 	if s.cache != nil {
 		cached, err := s.cache.GetByID(ctx, id)
 		if err != nil {
@@ -109,12 +112,10 @@ func (s *UserService) GetByID(ctx context.Context, id int) (*model.User, error) 
 		}
 	}
 
-
 	user, err := s.repo.GetByID(ctx, uint(id))
 	if err != nil {
 		return nil, err
 	}
-
 
 	if s.cache != nil && user != nil {
 		_ = s.cache.SetByID(ctx, user, s.ttl)
@@ -132,7 +133,7 @@ func (s *UserService) Delete(ctx context.Context, id int) error {
 		return err
 	}
 
-	
+	// delete-through
 	if s.cache != nil {
 		_ = s.cache.DeleteByID(ctx, id)
 	}
