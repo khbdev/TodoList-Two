@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
 	"user-service/inrernal/domain"
+	"user-service/inrernal/repository/model"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -22,17 +24,16 @@ func key(id int) string {
 	return fmt.Sprintf("user:%d", id)
 }
 
-
-func (c *UserCache) GetByID(ctx context.Context, id int) (*domain.User, error) {
+func (c *UserCache) GetByID(ctx context.Context, id int) (*model.User, error) {
 	val, err := c.rdb.Get(ctx, key(id)).Result()
 	if err == redis.Nil {
-		return nil, nil 
+		return nil, nil
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	var user domain.User
+	var user model.User
 	if err := json.Unmarshal([]byte(val), &user); err != nil {
 		return nil, err
 	}
@@ -40,8 +41,11 @@ func (c *UserCache) GetByID(ctx context.Context, id int) (*domain.User, error) {
 	return &user, nil
 }
 
+func (c *UserCache) SetByID(ctx context.Context, user *model.User, ttl time.Duration) error {
+	if user == nil {
+		return nil
+	}
 
-func (c *UserCache) SetByID(ctx context.Context, user *domain.User, ttl time.Duration) error {
 	data, err := json.Marshal(user)
 	if err != nil {
 		return err
@@ -50,9 +54,6 @@ func (c *UserCache) SetByID(ctx context.Context, user *domain.User, ttl time.Dur
 	return c.rdb.Set(ctx, key(int(user.ID)), data, ttl).Err()
 }
 
-
-
 func (c *UserCache) DeleteByID(ctx context.Context, id int) error {
 	return c.rdb.Del(ctx, key(id)).Err()
 }
-

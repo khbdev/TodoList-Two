@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 	"user-service/inrernal/cache"
 	"user-service/inrernal/config"
 	"user-service/inrernal/handler"
@@ -32,13 +33,14 @@ func main() {
 
 
   repo :=  postgres.NewUserRepo(db)
- 
-   srv := usecase.NewUserService(repo)
+  cache := cache.NewUserCache(redisClient)
+   srv := usecase.NewUserService(repo, cache, 5*time.Minute)
 
    hand := handler.NewUserGRPCHandler(srv)
 
+   
 
-  cache := cache.NewUserCache(redisClient)
+ 
 
-  _ = cache
+
 }
