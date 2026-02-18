@@ -15,7 +15,7 @@ var (
 )
 
 type UserRepo struct {
-	db *gorm.DB
+	db *gorm.DB 
 }
 
 func NewUserRepo(db *gorm.DB) *UserRepo {
