@@ -4,9 +4,10 @@ go 1.25.6
 
 require (
 	github.com/joho/godotenv v1.5.1
-	github.com/khbdev/todolist-proto v0.0.0-20260215221845-f685c4cbdc94
+	github.com/khbdev/todolist-proto v0.0.0-20260219141143-2ff985f5b4a4
 	github.com/redis/go-redis/v9 v9.17.3
 	golang.org/x/crypto v0.46.0
+	google.golang.org/grpc v1.79.1
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.31.1
 )
@@ -25,6 +26,5 @@ require (
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
-	google.golang.org/grpc v1.79.1 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 )

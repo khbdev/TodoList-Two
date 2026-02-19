@@ -14,4 +14,11 @@ type UserRepository interface {
 	Update(ctx context.Context, user *model.User) error
 	
 	Delete(ctx context.Context, id uint) error
+
+}
+
+
+
+type AuthUsecase interface {
+	Login(ctx context.Context, email, password string) (*User, bool, error)
 }

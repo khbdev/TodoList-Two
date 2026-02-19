@@ -12,4 +12,6 @@ type UserUsecase interface {
 
 	GetByID(ctx context.Context, id int) (*model.User, error)
 	GetAll(ctx context.Context) ([]model.User, error)
+
+	Login(ctx context.Context, email string, password string) (*model.User, bool, error)
 }
