@@ -1,45 +1,73 @@
 package main
 
 import (
-	// "log"
 	"log"
+	"net"
+	"os"
+	"time"
+
+	"google.golang.org/grpc"
+
 	"notes-service/internal/cache"
 	"notes-service/internal/config"
+	"notes-service/internal/handler"
 	"notes-service/internal/repository/postgres"
 	"notes-service/internal/usecase"
 	"notes-service/pkg"
-	"time"
+
+	notespb "github.com/khbdev/todolist-proto/proto/notes"
 )
 
+func main() {
 
-
-func main(){
-	// load env
+	//  Load .env
 	pkg.LoadEnv()
 
-	// sql connection
-
+	//  Postgres
 	db, err := config.NewPostgresDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-   
-
-
-
-
-	rdb, err := config.NewRedisClient()
-if err != nil {
+	//  Redis
+	redisClient, err := config.NewRedisClient()
+	if err != nil {
 		log.Fatal(err)
 	}
 
-
-	
-   cache := cache.NewTodoCache(rdb)
+	// Repository
 	repo := postgres.NewTodoRepo(db)
-	srv := usecase.NewTodoService(repo, cache, 5*time.Minute)
 
- 
+	// Cache
+	todoCache := cache.NewTodoCache(redisClient)
 
+	// Usecase (service)
+	srv := usecase.NewTodoService(repo, todoCache, 5*time.Minute)
+
+	//  gRPC handler
+	grpcHandler := handler.NewNotesHandler(srv)
+
+	//  gRPC server
+	grpcServer := grpc.NewServer()
+
+	// Register proto service
+	notespb.RegisterNotesServiceServer(grpcServer, grpcHandler)
+
+	//  Listen
+	addr := os.Getenv("PORT")
+	if addr == "" {
+		addr = ":50052"
+	}
+
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Notes gRPC server running on %s", addr)
+
+	//  Serve
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatal(err)
+	}
 }
