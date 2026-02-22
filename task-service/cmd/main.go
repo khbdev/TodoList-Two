@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net"
 	"os"
 	"task-service/internal/cache"
 	"task-service/internal/config"
@@ -23,7 +24,7 @@ import (
 func main(){
 	pkg.LoadEnv()
 
-		// config.CreateTopic()
+		config.CreateTopic()
 	db, err := config.NewPostgresDB()
 	if err != nil {
 		log.Fatal(err)
@@ -49,7 +50,17 @@ func main(){
 		addr = ":50053"
 	}
 
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+		log.Printf("Task gRPC server running on %s", addr)
+
+
+		if err := grpcServer.Serve(lis); err != nil {
+		log.Fatal(err)
+	}
 
 	
 }
