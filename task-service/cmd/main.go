@@ -2,9 +2,17 @@ package main
 
 import (
 	"log"
+	"os"
+	"task-service/internal/cache"
 	"task-service/internal/config"
+	"task-service/internal/handler"
 	"task-service/internal/repository/postgres"
+	"task-service/internal/usecase"
 	"task-service/pkg"
+	"time"
+
+	taskpb "github.com/khbdev/todolist-proto/proto/task"
+	"google.golang.org/grpc"
 )
 
 
@@ -15,14 +23,33 @@ import (
 func main(){
 	pkg.LoadEnv()
 
+		// config.CreateTopic()
 	db, err := config.NewPostgresDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	// config.NewPostgresDB()
-	config.NewRedisClient()
-	config.CreateTopic()
-     repo := postgres.NewTaskRepo(db)
+	rdb, err := config.NewRedisClient()
+	if err != nil {
+		log.Fatal(err)
+	}
+	 
+	cache := cache.NewReminderCache(rdb)
+	
 
-	 _ = repo
+     repo := postgres.NewTaskRepo(db)
+	 srv := usecase.NewReminderService(repo, cache, 5*time.Minute)
+	 hand := handler.NewTaskHandler(srv)
+
+	 grpcServer := grpc.NewServer()
+
+	 taskpb.RegisterTaskServiceServer(grpcServer, hand)
+
+	 	addr := os.Getenv("PORT")
+	if addr == "" {
+		addr = ":50053"
+	}
+
+
+
+	
 }
