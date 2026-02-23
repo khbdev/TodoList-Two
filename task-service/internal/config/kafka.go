@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
-	"net"
+
 	"os"
 	"strings"
 	"time"
@@ -33,19 +33,8 @@ func CreateTopic() error {
 	}
 	defer conn.Close()
 
-	controller, err := conn.Controller()
-	if err != nil {
-		return fmt.Errorf("controller error: %w", err)
-	}
 
-	ctrlAddr := net.JoinHostPort(controller.Host, fmt.Sprintf("%d", controller.Port))
-	adminConn, err := dialer.Dial("tcp", ctrlAddr)
-	if err != nil {
-		return fmt.Errorf("controller dial error: %w", err)
-	}
-	defer adminConn.Close()
-
-	err = adminConn.CreateTopics(kafka.TopicConfig{
+	err = conn.CreateTopics(kafka.TopicConfig{
 		Topic:             topic,
 		NumPartitions:     3,
 		ReplicationFactor: 1,
