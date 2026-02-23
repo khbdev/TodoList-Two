@@ -6,6 +6,7 @@ import (
 	"os"
 	"task-service/internal/cache"
 	"task-service/internal/config"
+	"task-service/internal/event"
 	"task-service/internal/handler"
 	"task-service/internal/repository/postgres"
 	"task-service/internal/usecase"
@@ -24,7 +25,12 @@ import (
 func main(){
 	pkg.LoadEnv()
 
-		config.CreateTopic()
+	if err := config.CreateTopic(); err != nil {
+	log.Fatal(err)
+}
+prod := event.NewProducer()
+prod.Close()
+
 	db, err := config.NewPostgresDB()
 	if err != nil {
 		log.Fatal(err)
