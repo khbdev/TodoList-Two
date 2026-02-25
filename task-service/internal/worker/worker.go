@@ -35,7 +35,7 @@ func (w *ReminderWorker) Run(ctx context.Context) {
 		case <-ticker.C:
 			var list []models.Reminder
 
-			// ✅ DB o‘zi NOW() bilan hisoblaydi (timezone muammosi yo‘q)
+			
 			if err := w.db.WithContext(ctx).
 				Where("notified = false AND remind_at <= NOW()").
 				Find(&list).Error; err != nil {
@@ -44,18 +44,18 @@ func (w *ReminderWorker) Run(ctx context.Context) {
 			}
 
 			if len(list) == 0 {
-				// log.Println("worker: no due reminders")
+	
 				continue
 			}
 
 			for _, r := range list {
-				// 1) publish
+			
 				if err := w.prod.PublishTask(ctx, int64(r.UserID), r.Task); err != nil {
 					log.Println("publish error reminder_id=", r.ID, "err=", err)
 					continue
 				}
 
-				// 2) notified=true (faqat hali false bo‘lsa)
+				
 				if err := w.db.WithContext(ctx).
 					Model(&models.Reminder{}).
 					Where("id = ? AND notified = false", r.ID).
