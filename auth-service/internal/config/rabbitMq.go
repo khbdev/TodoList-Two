@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/rabbitmq/amqp091-go"
 )
@@ -19,7 +20,7 @@ type RabbitMQConnection struct {
 
 
 func NewRabbitMq() *RabbitMQConnection {
-	url := "amqp://admin:admin123@localhost:5672/"
+	url := os.Getenv("AMQP_URL")
 
 	conn, err := amqp091.Dial(url)
 	if err != nil {
