@@ -66,6 +66,6 @@ func (w *ReminderWorker) Run(ctx context.Context) {
 
 				log.Println("reminder sent + marked notified id=", r.ID)
 			}
-		}
+		}  
 	}
 }
