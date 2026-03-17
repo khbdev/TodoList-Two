@@ -14,41 +14,6 @@ This project is designed to practice **backend system design concepts** such as:
 * Worker processes
 * JWT authentication
 
----
-
-# 🏗 Architecture
-
-System consists of several independent services.
-
-```
-                ┌──────────────┐
-                │  API Gateway │
-                └──────┬───────┘
-                       │
-        ┌──────────────┼──────────────┐
-        │              │              │
-   ┌────▼─────┐  ┌─────▼─────┐  ┌─────▼─────┐
-   │  Auth    │  │   User    │  │   Notes   │
-   │ Service  │  │ Service   │  │ Service   │
-   └────┬─────┘  └─────┬─────┘  └─────┬─────┘
-        │               │              │
-        │               │              │
-   RabbitMQ          gRPC           Redis
-        │
-        ▼
-   ┌─────────────┐
-   │ Email       │
-   │ Service     │
-   └──────┬──────┘
-          │
-        Kafka
-          │
-          ▼
-     ┌───────────┐
-     │ Task      │
-     │ Service   │
-     └───────────┘
-```
 
 ---
 
