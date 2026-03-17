@@ -16,7 +16,7 @@ type UserClient struct {
 }
 
 func NewUserClient() (*UserClient, error) {
-	conn, err := connect.ConnectService("user-service")
+	conn, err := connect.ConnectService("user-service-proto")
 	if err != nil {
 		return nil, fmt.Errorf("user-service ga ulanish xatosi: %v", err)
 	}
