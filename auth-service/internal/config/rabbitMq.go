@@ -18,34 +18,32 @@ type RabbitMQConnection struct {
 }
 
 
-
 func NewRabbitMq() *RabbitMQConnection {
 	url := os.Getenv("AMQP_URL")
 
 	conn, err := amqp091.Dial(url)
 	if err != nil {
-		log.Fatal("Failed to Connection")
+		log.Fatal("RabbitMq Failed to Connection")
 	}
-	defer conn.Close()
+
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Fatal("Failed to Channel")
+		log.Fatal("RabbitMq Failed to Channel")
 	}
-	defer ch.Close()
 
 	r := &RabbitMQConnection{
-		Conn: conn,
+		Conn:    conn,
 		Channel: ch,
 	}
-	
-fmt.Println("RabbitMQ Connection SuccessFull")
-if err := r.RabbitMqSetup(); err != nil {
-		log.Fatal("RabbitMQ Setup nil")
-	}
-	return  r
-	
-}
 
+	fmt.Println("RabbitMQ Connection SuccessFull")
+
+	if err := r.RabbitMqSetup(); err != nil {
+		log.Fatal("RabbitMQ Setup error")
+	}
+
+	return r
+}
 
 
 func (r *RabbitMQConnection ) RabbitMqSetup() error {

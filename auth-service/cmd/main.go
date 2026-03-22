@@ -3,12 +3,10 @@ package main
 import (
 	"auth-service/internal/client"
 	"auth-service/internal/config"
+	"auth-service/internal/producer"
 	"auth-service/internal/usecase"
 	"auth-service/pkg/env"
-	"context"
-	"fmt"
 	"log"
-	"time"
 )
 
 
@@ -30,19 +28,13 @@ func main(){
 		log.Fatal("user client error: ", err)
 	}
 	
+	prodcur := producer.NewProducer(rabbitMq)
 
-	
+	_ = prodcur
+
 	_ = loginProtoClient
 
-	createUserUsecase := usecase.NewAuthUsecase(userServiceClient)
-ctx, cancel := context.WithTimeout(context.Background(), 3 * time.Second)
-defer cancel()
-user, err :=	createUserUsecase.Register(ctx, "Azizbek", "khbcoderssssss@gmail.com", "salom123")
-if err != nil {
-	log.Fatal(err)
-}
-fmt.Println(user)
+	createUserUsecase := usecase.NewAuthUsecase(userServiceClient, *prodcur)
 
-	select {}
-	
+	_ = createUserUsecase
 }
