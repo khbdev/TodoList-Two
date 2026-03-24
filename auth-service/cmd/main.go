@@ -3,38 +3,60 @@ package main
 import (
 	"auth-service/internal/client"
 	"auth-service/internal/config"
+	"auth-service/internal/handler"
 	"auth-service/internal/producer"
 	"auth-service/internal/usecase"
 	"auth-service/pkg/env"
 	"log"
+	"net"
+	"os"
+
+	authpb "github.com/khbdev/todolist-proto/proto/auth"
+	createpb "github.com/khbdev/todolist-proto/proto/create"
+	"google.golang.org/grpc"
 )
 
-
-
-func main(){
+func main() {
 	env.LoadEnv()
-	 
-	rabbitMq := config.NewRabbitMq()
 
-	_ = rabbitMq
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "50051"
+	}
+
+	rabbitMq := config.NewRabbitMq()
 
 	userServiceClient, err := client.NewUserClient()
 	if err != nil {
 		log.Fatal("user client error: ", err)
 	}
-	
+
 	loginProtoClient, err := client.NewLoginClient()
-		if err != nil {
-		log.Fatal("user client error: ", err)
+	if err != nil {
+		log.Fatal("login client error: ", err)
 	}
-	
-	prodcur := producer.NewProducer(rabbitMq)
 
-	_ = prodcur
+	producer := producer.NewProducer(rabbitMq)
 
-	_ = loginProtoClient
+	createUserUsecase := usecase.NewAuthUsecase(userServiceClient, *producer)
+	loginUserUsecase := usecase.NewLoginUsecase(loginProtoClient)
 
-	createUserUsecase := usecase.NewAuthUsecase(userServiceClient, *prodcur)
+	createHandler := handler.NewAuthHandler(createUserUsecase)
+	loginHandler := handler.NewLoginHandler(loginUserUsecase)
 
-	_ = createUserUsecase
+	lis, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatal("listen error: ", err)
+	}
+
+	grpcServer := grpc.NewServer()
+
+	createpb.RegisterUserServiceServer(grpcServer, createHandler)
+	authpb.RegisterAuthServiceServer(grpcServer, loginHandler)
+
+	log.Println("gRPC server running on port:", port)
+
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatal("grpc serve error: ", err)
+	}
 }

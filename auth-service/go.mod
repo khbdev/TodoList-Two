@@ -5,7 +5,7 @@ go 1.25.7
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/joho/godotenv v1.5.1
-	github.com/khbdev/todolist-proto v0.0.0-20260221234237-2f96f51ce28d
+	github.com/khbdev/todolist-proto v0.0.0-20260323230453-477c239c9dc1
 	github.com/rabbitmq/amqp091-go v1.10.0
 	google.golang.org/grpc v1.79.1
 )
