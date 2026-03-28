@@ -1,8 +1,10 @@
 package main
 
 import (
+
 	"emai-service/internal/client"
 	"emai-service/internal/config"
+	"emai-service/internal/service"
 	"emai-service/pkg/env"
 )
 
@@ -20,4 +22,9 @@ func main(){
  
 	clientUser := client.NewUserClient()
 	_ = clientUser
+
+	email := service.NewEmailService()
+
+	_ = email
+
 }
