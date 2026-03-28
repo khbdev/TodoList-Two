@@ -8,10 +8,9 @@ on:
 
 jobs:
   build-test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
         go: [1.24]
         service: [user-service-todo, task-service-todo, notes-service-todo, email-service-todo, auth-service-todo]
 
@@ -26,10 +25,11 @@ jobs:
 
       - name: Build ${{ matrix.service }}
         run: |
-          cd ${{ matrix.service }}
+          cd services/${{ matrix.service }}
+          mkdir -p bin
           go build -o bin/${{ matrix.service }} ./cmd/main.go
 
       - name: Test ${{ matrix.service }}
         run: |
-          cd ${{ matrix.service }}
+          cd services/${{ matrix.service }}
           go test ./...

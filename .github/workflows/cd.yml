@@ -9,10 +9,9 @@ jobs:
   docker:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        service: [user-service, task-service, notes-service, email-service, auth-service]
+        service: [user-service-todo, task-service-todo, notes-service-todo, email-service-todo, auth-service-todo]
 
     steps:
       - name: Checkout repo
@@ -26,10 +25,9 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          IMAGE=gopherkhb/${{ matrix.service }}
+          IMAGE=gopherkhb/todoapp:${{ matrix.service }}-latest
+          cd services/${{ matrix.service }}
 
-          cd ${{ matrix.service }}
-
-          docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} .
-          docker push $IMAGE:latest
-          docker push $IMAGE:${{ github.sha }}
+          docker build -t $IMAGE -t gopherkhb/todoapp:${{ matrix.service }}-${{ github.sha }} .
+          docker push $IMAGE
+          docker push gopherkhb/todoapp:${{ matrix.service }}-${{ github.sha }}
