@@ -1,10 +1,10 @@
 package main
 
 import (
-
 	"emai-service/internal/client"
 	"emai-service/internal/config"
 	"emai-service/internal/service"
+	"emai-service/internal/usecase"
 	"emai-service/pkg/env"
 )
 
@@ -26,5 +26,9 @@ func main(){
 	email := service.NewEmailService()
 
 	_ = email
+
+	srv := usecase.NewEmailUsecase(email, clientUser)
+
+	
 
 }
