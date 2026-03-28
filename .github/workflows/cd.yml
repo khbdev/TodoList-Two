@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-  service: [user-service-todo, task-service-todo, notes-service-todo, email-service-todo, auth-service-todo]
+        service: [user-service-todo, task-service-todo, notes-service-todo, email-service-todo, auth-service-todo]
 
     steps:
       - name: Checkout repo
@@ -24,6 +24,8 @@ jobs:
 
       - name: Build & Push Docker Image
         run: |
-          cd ${{ matrix.service }}
-          docker build -t gopherkhb/${{ matrix.service }}:latest .
-          docker push gopherkhb/${{ matrix.service }}:latest
+          IMAGE=gopherkhb/todoapp:${{ matrix.service }}-latest
+          cd services/${{ matrix.service }}
+          docker build -t $IMAGE -t gopherkhb/todoapp:${{ matrix.service }}-${{ github.sha }} .
+          docker push $IMAGE
+          docker push gopherkhb/todoapp:${{ matrix.service }}-${{ github.sha }}
