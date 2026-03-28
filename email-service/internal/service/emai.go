@@ -33,33 +33,21 @@ func NewEmailService() domain.EmailSender {
 		password: os.Getenv("SMTP_PASS"),
 	}
 }
-
-func (s *EmailService) Send(ctx context.Context, data any) error {
-	var d EmailData
-	switch v := data.(type) {
-	case EmailData:
-		d = v
-	case *EmailData:
-		d = *v
-	default:
-		return fmt.Errorf("invalid data type: %T", data)
-	}
-
+func (s *EmailService) Send(ctx context.Context, data domain.EmailData) error {
 	auth := smtp.PlainAuth("", s.username, s.password, s.smtpHost)
-	to := []string{d.Email}
+	to := []string{data.Email}
 	msg := []byte(
-		"To: " + d.Email + "\r\n" +
-			"Subject: " + d.Subject + "\r\n" +
+		"To: " + data.Email + "\r\n" +
+			"Subject: " + data.Subject + "\r\n" +
 			"\r\n" +
-			d.Body + "\r\n",
+			data.Body + "\r\n",
 	)
 
 	addr := s.smtpHost + ":" + s.smtpPort
-	err := smtp.SendMail(addr, auth, s.username, to, msg)
-	if err != nil {
+	if err := smtp.SendMail(addr, auth, s.username, to, msg); err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
 
-	fmt.Printf("Email sent to %s successfully\n", d.Email)
+	fmt.Printf("Email sent to %s successfully\n", data.Email)
 	return nil
 }

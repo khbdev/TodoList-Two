@@ -16,7 +16,7 @@ type KafkaConsumer struct {
 
 type KafkaTaskMessage struct {
 	UserId int64 `json:"user_id"`
-	TaskName string `json:"task_name"`
+	TaskName string `json:"task"`
 }
 
 func NewKafkaConsumer(reader *kafka.Reader, usecase domain.SendEmailUsecase) *KafkaConsumer {
