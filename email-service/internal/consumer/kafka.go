@@ -47,7 +47,7 @@ func (c *KafkaConsumer) Consume(ctx context.Context) error {
 				continue
 			}
 
-			if err := c.usecase.Execute(ctx, "kafka", data); err != nil {
+			if err := c.usecase.SendToKafka(ctx, data.UserId, data.TaskName); err != nil {
 				log.Println("kafka usecase error:", err)
 				continue
 			}

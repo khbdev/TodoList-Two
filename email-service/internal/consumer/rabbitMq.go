@@ -64,7 +64,7 @@ func (c *RabbitMQConsumer) Consume(ctx context.Context) error {
 				continue
 			}
 
-			if err := c.usecase.Execute(ctx, "rabbitmq", data); err != nil {
+			if err := c.usecase.SendToRabbitMQ(ctx, data.Name, data.Email); err != nil {
 				log.Println("usecase error:", err)
 				_ = msg.Nack(false, true)
 				continue

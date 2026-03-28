@@ -9,5 +9,6 @@ type BrokerType string
 
 
 type SendEmailUsecase interface {
-	Execute(ctx context.Context, brokerType string, data any) error
+	SendToRabbitMQ(ctx context.Context, name, email string) error
+	SendToKafka(ctx context.Context, userID int64, taskName string) error
 }
