@@ -8,12 +8,12 @@ on:
 
 jobs:
   build-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        go: [1.24]
+        os: [ubuntu-latest]
+        go: [1.26]
         service: [user-service-todo, task-service-todo, notes-service-todo, email-service-todo, auth-service-todo]
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -25,11 +25,10 @@ jobs:
 
       - name: Build ${{ matrix.service }}
         run: |
-          cd services/${{ matrix.service }}
-          mkdir -p bin
+          cd ${{ matrix.service }}
           go build -o bin/${{ matrix.service }} ./cmd/main.go
 
       - name: Test ${{ matrix.service }}
         run: |
-          cd services/${{ matrix.service }}
+          cd ${{ matrix.service }}
           go test ./...
