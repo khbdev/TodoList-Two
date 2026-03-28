@@ -10,7 +10,7 @@ node_modules/
 dist/
 build/
 tmp/
-cache/
+
 
 # OS system files
 .DS_Store
