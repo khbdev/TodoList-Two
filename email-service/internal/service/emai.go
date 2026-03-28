@@ -34,10 +34,14 @@ func NewEmailService() domain.EmailSender {
 	}
 }
 
-// Send – interface method implementatsiyasi
 func (s *EmailService) Send(ctx context.Context, data any) error {
-	d, ok := data.(EmailData)
-	if !ok {
+	var d EmailData
+	switch v := data.(type) {
+	case EmailData:
+		d = v
+	case *EmailData:
+		d = *v
+	default:
 		return fmt.Errorf("invalid data type: %T", data)
 	}
 

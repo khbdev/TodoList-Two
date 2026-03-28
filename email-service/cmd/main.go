@@ -1,34 +1,70 @@
 package main
 
 import (
+	"context"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"emai-service/internal/client"
 	"emai-service/internal/config"
+	"emai-service/internal/consumer"
 	"emai-service/internal/service"
 	"emai-service/internal/usecase"
 	"emai-service/pkg/env"
 )
 
-
-func main(){
+func main() {
+	// .env fayldan konfiguratsiya o'qish
 	env.Load()
 
+	// RabbitMQ konfiguratsiyasi
 	rabbit := config.NewRabbitMQ()
 	defer rabbit.Conn.Close()
 	defer rabbit.Channel.Close()
 
+	// Kafka konfiguratsiyasi
 	kafka := config.NewKafka()
-
 	defer kafka.Close()
- 
-	clientUser := client.NewUserClient()
-	_ = clientUser
 
+	// User service client
+	clientUser := client.NewUserClient()
+
+	// Email service
 	email := service.NewEmailService()
 
-	_ = email
-
+	// Usecase
 	srv := usecase.NewEmailUsecase(email, clientUser)
 
-	
+	// Consumerlar
+	consumerKafka := consumer.NewKafkaConsumer(kafka.Reader, srv)
+	consumerRabbitMq := consumer.NewRabbitMQConsumer(rabbit, srv)
 
+	// Context: doimiy ishlash uchun Background
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Consumer goroutine'lari
+	go func() {
+		if err := consumerKafka.Consume(ctx); err != nil {
+			log.Printf("Kafka consumer error: %v", err)
+		}
+	}()
+	go func() {
+		if err := consumerRabbitMq.Consume(ctx); err != nil {
+			log.Printf("RabbitMQ consumer error: %v", err)
+		}
+	}()
+
+	// Signal handling: Ctrl+C yoki server stop uchun
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+
+	sig := <-sigCh
+	log.Printf("Received signal %v, shutting down gracefully...", sig)
+
+	// Goroutine'lar context cancel orqali to'xtaydi
+	cancel()
+	log.Println("Service stopped")
 }
