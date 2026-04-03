@@ -14,7 +14,7 @@ type emailUsecase struct {
 	emailSender domain.EmailSender
 }
 
-// Constructor
+
 func NewEmailUsecase(sender domain.EmailSender, uc *client.UserClient) domain.SendEmailUsecase {
 	return &emailUsecase{
 		userClient:  uc,
@@ -22,7 +22,7 @@ func NewEmailUsecase(sender domain.EmailSender, uc *client.UserClient) domain.Se
 	}
 }
 
-// SendToRabbitMQ: avtomatik subject va body bilan yuboradi
+
 func (u *emailUsecase) SendToRabbitMQ(ctx context.Context, name, email string) error {
 	data := domain.EmailData{
 		Name:    name,

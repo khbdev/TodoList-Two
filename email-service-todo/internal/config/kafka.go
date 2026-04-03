@@ -1,6 +1,10 @@
 package config
 
-import "github.com/segmentio/kafka-go"
+import (
+	"os"
+
+	"github.com/segmentio/kafka-go"
+)
 
 type Kafka struct {
 	Reader *kafka.Reader
@@ -9,9 +13,9 @@ type Kafka struct {
 func NewKafka() *Kafka {
 	return &Kafka{
 		Reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers: []string{"localhost:9092"},
-			Topic:   "task_event",
-			GroupID: "email-service",
+			Brokers: []string{os.Getenv("KAFKA_URL")},
+			Topic:   os.Getenv("TOPIC"),
+			GroupID: os.Getenv("GROUP_NAME"),
 		}),
 	}
 }

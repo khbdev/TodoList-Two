@@ -41,11 +41,11 @@ func main() {
 	consumerKafka := consumer.NewKafkaConsumer(kafka.Reader, srv)
 	consumerRabbitMq := consumer.NewRabbitMQConsumer(rabbit, srv)
 
-	// Context: doimiy ishlash uchun Background
+	
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// Consumer goroutine'lari
+
 	go func() {
 		if err := consumerKafka.Consume(ctx); err != nil {
 			log.Printf("Kafka consumer error: %v", err)
@@ -57,14 +57,14 @@ func main() {
 		}
 	}()
 
-	// Signal handling: Ctrl+C yoki server stop uchun
+
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 
 	sig := <-sigCh
 	log.Printf("Received signal %v, shutting down gracefully...", sig)
 
-	// Goroutine'lar context cancel orqali to'xtaydi
+
 	cancel()
 	log.Println("Service stopped")
 }
